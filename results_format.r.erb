@@ -1,0 +1,36 @@
+library(tidyverse)
+
+data <- read_tsv("./results/normalized_counts.txt")
+all_data <- data
+
+sample_list <- read_tsv("./sample_list.txt", col_names = FALSE)
+colnames(sample_list) <- c("sample_id", "group_id")
+
+annotation <- read_tsv("./annotation.txt")
+
+<% comp_list.each do |num, pair| %>
+  # comp<%= num %>
+  result <- read_tsv("./results/comp<%= num %>.edgeR.DE_results")
+  sorted_result <- arrange(result, desc(comp<%= num %>_logFC))
+  all_data      <- inner_join(all_data, sorted_result)
+  deg_by_PValue <- filter(sorted_result, comp<%= num %>_PValue < 0.05)
+  deg_by_logFC  <- filter(sorted_result, abs(comp<%= num %>_logFC) > 1)
+  
+  group1_ids <- filter(sample_list, group_id == "<%= pair.first %>")$sample_id
+  group2_ids <- filter(sample_list, group_id == "<%= pair.last  %>")$sample_id
+  comp_pair  <- c(group1_ids, group2_ids)
+  comp_data  <- select(data, c("GeneSymbol", comp_pair))
+  comp_data_with_annot <- left_join(comp_data, annotation)
+  
+  result_deg_by_PValue <- inner_join(deg_by_PValue, comp_data_with_annot)
+  result_deg_by_logFC  <- inner_join(deg_by_logFC,  comp_data_with_annot)
+  detected_genes       <- inner_join(sorted_result, comp_data_with_annot)
+  
+  write_tsv(result_deg_by_PValue, "./results/comp<%= num %>_result_deg_by_PValue.tsv")
+  write_tsv(result_deg_by_logFC,  "./results/comp<%= num %>_result_deg_by_logFC.tsv")
+  write_tsv(detected_genes,       "./results/comp<%= num %>_detected_genes.tsv")
+<% end %>
+
+all_results <- inner_join(all_data, annotation)
+write_tsv(all_results, "./results/all_results.tsv")
+

@@ -1,0 +1,32 @@
+library("edgeR")
+source("<%= x_seq_dir %>/RNAseq_plot_lib.r")
+
+data = read.table("./counts.matrix", header=T, row.names=1, com='')
+rnaseqMatrix = round(data)
+rnaseqMatrix = rnaseqMatrix[rowSums(rnaseqMatrix) >= <%= @sample_ids.size %>,]
+sampleIds <- c(<%= to_strings(@sample_ids) %>)
+groupIds  <- c(<%= to_strings(@group_ids) %>)
+conditions = factor(groupIds)
+
+exp_study = DGEList(counts=rnaseqMatrix, group=conditions)
+exp_study = calcNormFactors(exp_study)
+exp_study = estimateCommonDisp(exp_study)
+exp_study = estimateTagwiseDisp(exp_study)
+nc = cpm(exp_study, normalized.lib.sizes=TRUE)
+
+colnames(nc) <- sampleIds
+header <- c("GeneSymbol", sampleIds)
+normalized_counts <- rbind(header, cbind(rownames(nc), nc))
+write.table(normalized_counts, file="./results/normalized_counts.txt", sep="\t", quote=F, row.names=F, col.names=F)
+ncBoxPlot(nc, sampleIds)
+
+<% comp_list.each do |num, pair| %>
+  # comp<%= num %>
+  et = exactTest(exp_study, pair=c(<%= to_strings(pair) %>))
+  tTags = topTags(et,n=NULL)
+  result_table <- data.frame(GeneSymbol = rownames(tTags), tTags)
+  colnames(result_table) <- c("GeneSymbol", "comp<%= num %>_logFC", "comp<%= num %>_logCPM", "comp<%= num %>_PValue", "comp<%= num %>_FDR")
+  write.table(result_table, file="./results/comp<%= num %>.edgeR.DE_results", sep="\t", quote=F, row.names=F)
+  # ncScatterPlot(nc, <%= to_strings(pair) %>)
+  myPlotSmear(et, <%= to_strings(pair) %>)
+<% end %>
