@@ -8,6 +8,7 @@ scripts for high-throuput sequencing data analysis (RNA-seq, miRNA-seq, smallRNA
 * R    > 3.4.4
   * Biocoundctor (edgeR)
   * tidyverse
+  * gplots (for heatmap.2)
 * RSEM (v1.3.1) = ~/src/RSEM-1.3.1
   * ./RSEM directory stored sampleId.genes.results
 * annotation.txt; The tab delimited annotation list that should have GeneSymbol at first column.
