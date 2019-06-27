@@ -1,0 +1,35 @@
+#!/bin/bash
+
+GSEA_HOME="<%= gsea_home %>"
+
+java -cp ${GSEA_HOME}/gsea-3.0.jar -Xmx<%= memory %>m xtools.gsea.Gsea \
+  -res ./comp<%= i %>.gct \
+  -cls ./comp<%= i %>.cls#<%= comp_pair.join("_versus_") %> \
+  -gmx <%= gmx_file_path %>\
+  -collapse true \
+  -mode Max_probe \
+  -norm meandiv \
+  -nperm 1000 \
+  -permute gene_set \
+  -rnd_type no_balance \
+  -scoring_scheme weighted \
+  -rpt_label my_analysis \
+  -metric <%= gsea_metric %> \
+  -sort real \
+  -order descending \
+  -chip ./rnaseq_accession.chip \
+  -create_gcts false \
+  -create_svgs false \
+  -include_only_symbols true \
+  -make_sets true \
+  -median false \
+  -num 100 \
+  -plot_top_x 20 \
+  -rnd_seed timestamp \
+  -save_rnd_lists false \
+  -set_max 500 \
+  -set_min 15 \
+  -zip_report false \
+  -out ./GSEA_results_comp<%= i %>/ \
+  -gui false
+

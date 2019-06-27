@@ -3,6 +3,7 @@ require 'erb'
 class GseaXseq
   def initialize
     @sample_list = IO.readlines("./sample_list.txt").map(&:chomp)
+    @group_ids   = get_group_ids(@sample_list)
     @comp_list   = comp_list
     system("mkdir -p GSEA")
   end
@@ -29,6 +30,23 @@ class GseaXseq
       "#{Dir.home}/src/x-seq"
     end
 
+    def get_group_ids(sample_list)
+      sample_list.map { |x| x.split("\t").last.strip }
+    end
+
+    def comp_list
+      comp = IO.readlines("./comp_list.txt").map(&:chomp)
+      comp.map.with_index(1) { |pair, i| [i, pair_to_groups(pair)] }.to_h
+    end
+
+    def pair_to_groups(pair)
+      pair.split(" vs ").map(&:strip)
+    end
+
+    def data_is_n3?
+      @group_ids.size >= @group_ids.sort.uniq.size * 3
+    end
+
     def write_prepare_gct_r
       File.open("./prepare_gct.r", "w") do |f|
         f.print prepare_gct_r
@@ -41,18 +59,58 @@ class GseaXseq
     end
 
     def write_cls_files
+      @comp_list.each do |i, groups|
+        File.open("./GSEA/comp#{i}.cls", "w") do |f|
+          f.print cls_data(groups).join("\n")
+        end
+      end
+    end
+
+    def cls_data(groups)
+      data = []
+      data << "#{groups.size} 2 1"
+      data << "# #{groups.join(" ")}"
+      data << "#{compX_group_ids(groups).join(" ")}"
+    end
+
+    def compX_group_ids(groups)
+      group1_samples = @sample_list.select { |x| x.include?(groups.first) }
+      group2_samples = @sample_list.select { |x| x.include?(groups.last)  }
+      get_group_ids(group1_samples + group2_samples)
     end
 
     def write_gsea_sh
+      @comp_list.each do |i, comp_pair|
+        write_gsea_sh_with_gmx_each_comp(i, comp_pair)
+      end
     end
 
-    def comp_list
-      comp = IO.readlines("./comp_list.txt").map(&:chomp)
-      comp.map.with_index(1) { |pair, i| [i, pair_to_groups(pair)] }.to_h
+    def write_gsea_sh_with_gmx_each_comp(i, comp_pair)
+      gmx_file_list.each do |listname, gmx_file_path|
+        File.open("./GSEA/gsea_comp#{i}_#{listname}.sh", "w") do |f|
+          f.print gsea_sh(i, comp_pair, gmx_file_path)
+        end
+      end
     end
 
-    def pair_to_groups(pair)
-      pair.split(" vs ").map(&:strip)
+    def gsea_home
+      "#{Dir.home}/src/GSEA"
+    end
+
+    def gsea_sh(i, comp_pair, gmx_file_path)
+      memory = gmx_file_path.include?("c2.cgp") ? 2048 : 512
+      erb = ERB.new(IO.read("#{x_seq_dir}/gsea.sh.erb"))
+      erb.result(binding)
+    end
+
+    def gsea_metric
+      data_is_n3? ? "Signal2Noise" : "log2_Ratio_of_Classes"
+    end
+
+    def gmx_file_list
+      list = IO.readlines("./gmx_file_list.txt").map(&:chomp)
+      clean_list = list.select { |x| !(x =~ /^#|^$/) }
+      clean_list.map { |x| x.split("\t") }.to_h
     end
 
     def create_gct_files
