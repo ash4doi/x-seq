@@ -1,0 +1,26 @@
+library(tidyverse)
+
+data <- read_tsv("./results/normalized_counts.txt")
+all_data <- data
+
+sample_list <- read_tsv("./sample_list.txt", col_names = FALSE)
+colnames(sample_list) <- c("sample_id", "group_id")
+
+annotation  <- read_tsv("./annotation.txt")
+short_annot <- na.omit(select(annotation, GeneSymbol, GeneName, PrimaryAccession))
+chip_data   <- tibble("Probe Set ID" = short_annot$PrimaryAccession,
+                      "Gene Symbol"  = short_annot$GeneSymbol,
+                      "Gene Title"   = short_annot$GeneName)
+write_tsv(arrange(chip_data, `Gene Symbol`), "./GSEA/rnaseq_accession.chip")
+
+<% @comp_list.each do |num, pair| %>
+  # comp<%= num %>
+  group1_ids <- filter(sample_list, group_id == "<%= pair.first %>")$sample_id
+  group2_ids <- filter(sample_list, group_id == "<%= pair.last  %>")$sample_id
+  comp_pair  <- c(group1_ids, group2_ids)
+  comp_data  <- select(data, c("GeneSymbol", comp_pair))
+  gct_data   <- na.omit(right_join(short_annot, comp_data)) %>%
+                select(PrimaryAccession, GeneName, group1_ids, group2_ids)
+  colnames(gct_data) <- c("Name", "Description", group1_ids, group2_ids)
+  write_tsv(arrange(gct_data, Name), "./GSEA/comp<%= num %>_gct.tsv")
+<% end %>
