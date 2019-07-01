@@ -1,0 +1,9 @@
+# ignore
+*~
+
+# general
+.DS_Store
+
+# rbenv
+.ruby-version
+
