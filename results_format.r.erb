@@ -31,6 +31,6 @@ annotation <- read_tsv("./annotation.txt")
   write_tsv(detected_genes,       "./results/comp<%= num %>_detected_genes.tsv")
 <% end %>
 
-all_results <- inner_join(all_data, annotation)
+all_results <- left_join(all_data, annotation)
 write_tsv(all_results, "./results/all_results.tsv")
 
