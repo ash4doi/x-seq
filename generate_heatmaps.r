@@ -74,7 +74,7 @@ generate_heatmaps <- function(counts, title, size="small") {
   } else {
     # large heatmap
     png(paste("./heatmap/", title, "_GS_", size, ".png", sep = ""),
-        width  = width, height = nr*10
+        width  = width, height = nr*12
     )
     heatmap.2(
       mtrx, col = greenred(75), breaks = c(seq(-2, 2, length.out = 76)),
@@ -91,7 +91,7 @@ generate_heatmaps <- function(counts, title, size="small") {
     dev.off();
   
     png(paste("./heatmap/", title, "_G_", size, ".png", sep = ""),
-        width  = width, height = nr*10
+        width  = width, height = nr*12
     )
     heatmap.2(
       mtrx, col = greenred(75), breaks = c(seq(-2, 2, length.out = 76)),
