@@ -31,7 +31,11 @@ class GseaXseq
     end
 
     def get_group_ids(sample_list)
-      sample_list.map { |x| x.split("\t").last.strip }
+      sample_list.map { |s| group_id_of(s) }
+    end
+
+    def group_id_of(sample)
+      sample.split("\t").last.strip
     end
 
     def comp_list
@@ -74,8 +78,8 @@ class GseaXseq
     end
 
     def compX_group_ids(groups)
-      group1_samples = @sample_list.select { |x| x.include?(groups.first) }
-      group2_samples = @sample_list.select { |x| x.include?(groups.last)  }
+      group1_samples = @sample_list.select { |s| group_id_of(s).match?(/^#{groups.first}$/) }
+      group2_samples = @sample_list.select { |s| group_id_of(s).match?(/^#{groups.last}$/) }
       get_group_ids(group1_samples + group2_samples)
     end
 
