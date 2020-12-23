@@ -1,0 +1,4 @@
+PathwayId
+mmu00010
+mmu00020
+mmu00030

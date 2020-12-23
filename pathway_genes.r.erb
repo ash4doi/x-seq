@@ -1,0 +1,21 @@
+library(tidyverse)
+
+all_results <- read_tsv("./results/all_results.tsv",
+                        col_types = cols(EntrezGeneID = col_character()))
+
+#dir.create("pathway")
+pathways <- read_tsv("pathway_list.txt")
+
+for(pathway_id in pathways$PathwayId){
+  pathway_genes <- read_tsv(paste("./pathway/", pathway_id, "_ids.txt", sep = ""),
+                            col_names = c("EntrezGeneID"),
+                            col_types = cols(EntrezGeneID = col_character()))
+
+  pathway_genes_result <- all_results %>% inner_join(pathway_genes)
+  write_tsv(pathway_genes_result, paste("./pathway/pathway_", pathway_id, "_result.tsv", sep = ""))
+
+  pathway_genes_ratio <- pathway_genes_result %>%
+    select(EntrezGeneID, ends_with("_logFC"), ends_with("_PValue"))
+  write_tsv(pathway_genes_ratio, paste("./pathway/pathway_", pathway_id, "_logFC.tsv", sep = ""))
+}
+
