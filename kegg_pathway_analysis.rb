@@ -51,7 +51,7 @@ class KeggPathwayAnalysis
     end
 
     def pathway_uri(pathway_id)
-      org_id = pathway_id[0..2]
+      org_id = pathway_id.gsub(/\d/, "")
       "#{kegg_link}/#{org_id}/#{pathway_id}"
     end
 
@@ -84,7 +84,7 @@ class KeggPathwayAnalysis
     end
 
     def kegg_color_code(logFC)
-      if logFC > 1
+      if logFC > 0
         [kegg_color[:bg_up],   kegg_color[:fg]].join(",")
       else
         [kegg_color[:bg_down], kegg_color[:fg]].join(",")
