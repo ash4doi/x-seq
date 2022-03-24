@@ -102,7 +102,7 @@ class GseaXseq
     end
 
     def gsea_sh(i, comp_pair, gmx_file_path)
-      memory = gmx_file_path.include?("c2.cgp") ? 2048 : 512
+      memory = gmx_file_path.include?("h.all") ? 1024 : 2048
       erb = ERB.new(IO.read("#{x_seq_dir}/gsea.sh.erb"))
       erb.result(binding)
     end
