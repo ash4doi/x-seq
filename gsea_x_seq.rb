@@ -72,7 +72,7 @@ class GseaXseq
 
     def cls_data(groups)
       data = []
-      data << "#{groups.size} 2 1"
+      data << "#{compX_group_ids(groups).size} 2 1"
       data << "# #{groups.join(" ")}"
       data << "#{compX_group_ids(groups).join(" ")}"
     end
