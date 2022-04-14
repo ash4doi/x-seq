@@ -3,12 +3,14 @@
 require 'erb'
 require 'http'
 require 'nokogiri'
+require 'optparse'
 
 class KeggPathwayAnalysis
 
-  def initialize
+  def initialize(argv)
     system("mkdir -p pathway")
     @pathway_ids = IO.readlines("./pathway_list.txt").map(&:chomp).drop(1)
+    @params = argv.getopts("lp", "logFC", "pvalue")
   end
 
   def write_entrez_ids
@@ -70,11 +72,21 @@ class KeggPathwayAnalysis
       comp_data  = logFC_data.map { |x| {entrez_id: x[0],
                                          logFC: x[comp_num].to_f,
                                          PValue: x[comp_size + comp_num].to_f} }
-      deg_data   = comp_data.select { |x| (x[:logFC] > 1  && x[:PValue] < 0.05) ||
-                                          (x[:logFC] < -1 && x[:PValue] < 0.05) }
+      deg_data   = select_deg(comp_data)
       color_data = deg_data.map { |x| "#{x[:entrez_id]}+#{kegg_color_code(x[:logFC])}" }
       rest_data  = color_data.join("%0A").gsub("#", "%23").gsub(",", "%2C")
       url = "#{kegg_show_pathway}?map=#{pathway_id}&multi_query=#{rest_data}"
+    end
+
+    def select_deg(comp_data)
+      if @params["l"] || @params["logFC"] 
+        comp_data.select { |x| x[:logFC] > 1 || x[:logFC] < -1 }
+      elsif @params["p"] || @params["pvalue"]
+        comp_data.select { |x| x[:PValue] < 0.05 }
+      else
+        comp_data.select { |x| (x[:logFC] > 1  && x[:PValue] < 0.05) ||
+                               (x[:logFC] < -1 && x[:PValue] < 0.05) }
+      end
     end
 
     def kegg_color
@@ -115,7 +127,7 @@ class KeggPathwayAnalysis
 end
 
 if __FILE__ == $0
-  kegg_pathway_analysis = KeggPathwayAnalysis.new
+  kegg_pathway_analysis = KeggPathwayAnalysis.new(ARGV)
   kegg_pathway_analysis.write_entrez_ids
   kegg_pathway_analysis.extract_pathway_results
   kegg_pathway_analysis.write_pathway_list
