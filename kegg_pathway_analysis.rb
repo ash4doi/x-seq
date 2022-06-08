@@ -45,7 +45,7 @@ class KeggPathwayAnalysis
     end
 
     def kegg_link
-      "http://rest.kegg.jp/link"
+      "https://rest.kegg.jp/link"
     end
 
     def kegg_show_pathway
