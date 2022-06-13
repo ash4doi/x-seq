@@ -21,7 +21,7 @@ normalized_counts <- as_tibble(rownames_to_column(as.data.frame(nc), "GeneSymbol
 write_tsv(normalized_counts, "./results/normalized_counts.txt")
 ncBoxPlot(nc, sample_list$sampleIds)
 
-disp_table <- tibble("comp" = c(), "dispersion" = c())
+disp_table <- tibble("comp" = c("comp0"), "dispersion" = c(0))
 
 <% comp_list.each do |num, pair| %>
   # comp<%= num %>
@@ -53,4 +53,5 @@ disp_table <- tibble("comp" = c(), "dispersion" = c())
   myPlotSmear(et, <%= to_strings(pair) %>)
 <% end %>
 
+disp_table <- disp_table %>% filter(comp != "comp0")
 write_tsv(disp_table, "dispersions.txt")
