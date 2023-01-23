@@ -49,11 +49,6 @@ class CalculateDeg
       erb.result(binding)
     end
 
-    def edgeR_script_n3
-      erb = ERB.new(IO.read("#{x_seq_dir}/edgeR_script_n3.r.erb"))
-      erb.result(binding)
-    end
-
     def results_format_script
       erb = ERB.new(IO.read("#{x_seq_dir}/results_format.r.erb"))
       erb.result(binding)
