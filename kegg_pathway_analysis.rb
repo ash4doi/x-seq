@@ -2,7 +2,7 @@
 
 require 'erb'
 require 'http'
-require 'nokogiri'
+#require 'nokogiri'
 require 'optparse'
 
 class KeggPathwayAnalysis
@@ -11,6 +11,7 @@ class KeggPathwayAnalysis
     system("mkdir -p pathway")
     @pathway_ids = IO.readlines("./pathway_list.txt").map(&:chomp).drop(1)
     @params = argv.getopts("lp", "logFC", "pvalue")
+    @pathway_hash = get_pathway_hash(@pathway_ids.first)
   end
 
   def write_entrez_ids
@@ -57,9 +58,19 @@ class KeggPathwayAnalysis
       "#{kegg_link}/#{org_id}/#{pathway_id}"
     end
 
+    def rest_kegg_list(pathway_id)
+      org_id = pathway_id.gsub(/\d/, "")
+      "https://rest.kegg.jp/list/pathway/#{org_id}"
+    end
+
     def get_entrez_ids(pathway_id)
       pathway_genes = HTTP.get(pathway_uri(pathway_id)).to_s.lines
       pathway_genes.map {|x| x.split("\t").last.split(':').last.chomp}
+    end
+
+    def get_pathway_hash(pathway_id)
+      pathway_list = HTTP.get(rest_kegg_list(pathway_id)).to_s.lines
+      pathway_hash = pathway_list.map {|x| x.chomp.split("\t")}.to_h
     end
 
     def read_logFC_data(pathway_id)
@@ -115,9 +126,8 @@ class KeggPathwayAnalysis
     end
 
     def get_pathway_title(pathway_id)
-      url = "https://www.kegg.jp/pathway/#{pathway_id}"
-      doc = Nokogiri::HTML(HTTP.get(url).to_s)
-      pathway_id + ": " + doc.xpath("//head/title").to_s.gsub(/(<.*title>|\n)/, "")
+      title = @pathway_hash[pathway_id]
+      pathway_title = pathway_id + ": " + title
     end
 
     def write_pathway_genes_script
