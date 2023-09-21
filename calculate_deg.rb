@@ -50,6 +50,7 @@ class CalculateDeg
     end
 
     def results_format_script
+      date_string = get_date_string
       erb = ERB.new(IO.read("#{x_seq_dir}/results_format.r.erb"))
       erb.result(binding)
     end
@@ -69,6 +70,10 @@ class CalculateDeg
 
     def pair_to_array(pair)
       pair.split(" vs ").map(&:strip)
+    end
+
+    def get_date_string
+      Time.new.strftime("%Y%m%d")
     end
 end
 
