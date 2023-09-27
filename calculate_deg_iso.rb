@@ -15,6 +15,7 @@ class CalculateDegIso < CalculateDeg
     end
 
     def results_format_script
+      date_string = get_date_string
       erb = ERB.new(IO.read("#{x_seq_dir}/results_format_iso.r.erb"))
       erb.result(binding)
     end
