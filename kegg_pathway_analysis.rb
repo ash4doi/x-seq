@@ -10,7 +10,7 @@ class KeggPathwayAnalysis
   def initialize(argv)
     system("mkdir -p pathway")
     @pathway_ids = IO.readlines("./pathway_list.txt").map(&:chomp).drop(1)
-    @params = argv.getopts("lp", "logFC", "pvalue")
+    @params = argv.getopts("lp", "logFC", "pvalue", "result:all_results.tsv")
     @pathway_hash = get_pathway_hash(@pathway_ids.first)
   end
 
@@ -131,6 +131,7 @@ class KeggPathwayAnalysis
     end
 
     def write_pathway_genes_script
+      result_file = (@params["r"] || @params["result"])
       erb = ERB.new(IO.read("#{x_seq_dir}/pathway_genes.r.erb"))
       File.open("./pathway_genes.r", "w") { |f| f.print erb.result(binding) }
     end
