@@ -1,0 +1,170 @@
+library(tidyverse)
+
+all_results <- read_tsv("./results/<%= result_file %>")
+
+concat_go_results <- all_results %>%
+  mutate(GO_BP = if_else(is.na(GO_BiologicalProcess), "", GO_BiologicalProcess)) %>%
+  mutate(GO_CC = if_else(is.na(GO_CellularComponent), "", GO_CellularComponent)) %>%
+  mutate(GO_MF = if_else(is.na(GO_MolecularFunction), "", GO_MolecularFunction)) %>%
+  mutate("GO" = str_c(GO_BP, GO_CC, GO_MF, sep = ",")) %>%
+  select(-GO_BP, -GO_CC, -GO_MF)
+
+
+# CD_antigen
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneSymbol, "^C[Dd]\\d+") &
+         str_detect(GeneName, "molecule")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_CD_antigen.tsv")
+
+# MMP
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "matrix metallopeptidase")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_MMP.tsv")
+
+# PCR_control
+PCR_genes <- c('ABL1', 'ACTB', 'B2M', 'CASC3', 'CDKN1A',
+               'CDKN1B', 'EIF2B1', 'ELF1', 'GADD45A', 'GAPDH',
+               'GUSB', 'HMBS', 'HPRT1', 'IPO8', 'MRPL19', 
+               'MT-ATP6', 'PES1', 'PGK1', 'POLR2A', 'POP4',
+               'PPIA', 'PSMC4', 'PUM1', 'RNA18S5', 'RPL30',
+               'RPL37A', 'RPLP0', 'RPS17', 'TBP', 'TFRC',
+               'UBC', 'YWHAZ')
+
+PCR_control <- tibble("GeneSymbol" = c(PCR_genes,               # human
+                                      str_to_title(PCR_genes),  # mouse
+                                      str_to_lower(PCR_genes))) # rat
+
+interesting_genes_result <- concat_go_results %>% inner_join(PCR_control) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_PCR_control.tsv")
+
+# TGF-beta
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "transforming growth factor")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_TGF_beta.tsv")
+
+# Wnt
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "Wnt")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_Wnt.tsv")
+
+# aging
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "aging")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_aging.tsv")
+
+# angiogenesis
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "angiogenesis") |
+         str_detect(GO, "angiogenesis")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_angiogenesis.tsv")
+
+# apoptosis
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "apoptosis") |
+         str_detect(GO, "apoptosis")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_apoptosis.tsv")
+
+# calcium
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "calcium")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_calcium.tsv")
+
+# cell_adhesion
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "cell adhesion")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_cell_adhesion.tsv")
+
+# cell_cycle
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "cell cycle")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_cell_cycle.tsv")
+
+# cytokine_chemokine
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "cytokine") |
+         str_detect(GO, "chemokine")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_cytokine_chemokine.tsv")
+
+# differentiation
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "differentiation")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_differentiation.tsv")
+
+# extracellular_matrix
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "extracellular matrix")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_extracellular_matrix.tsv")
+
+# glucose_metabolic_process
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "0006006")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_glucose_metabolic_process.tsv")
+
+# immune
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "immune")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_immune.tsv")
+
+# inflammatory
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "inflammatory") |
+         str_detect(GO, "inflammatory")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_inflammatory.tsv")
+
+# lipid_metabolic_process
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "0006629")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_lipid_metabolic_process.tsv")
+
+# mitochondrion
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "mitochondrion")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_mitochondrion.tsv")
+
+# ossification
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "0001503")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_ossification.tsv")
+
+# oxidative_stress
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "oxidative stress")|
+         str_detect(GO, "oxidative stress")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_oxidative_stress.tsv")
+
+# proliferation
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "proliferation")|
+         str_detect(GO, "proliferation")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_proliferation.tsv")
+
+# reactive_oxygen
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "0006800") |
+         str_detect(GO, "0006979") |
+         str_detect(GO, "0000302")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_reactive_oxygen.tsv")
+
+# regeneration
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "regeneration")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_regeneration.tsv")
+
+# stem_cell
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "stem cell") |
+         str_detect(GO, "stem cell")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_stem_cell.tsv")
+
+# transcription_factor
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GO, "transcription factor")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_transcription_factor.tsv")
+
+# tumor
+interesting_genes_result <- concat_go_results %>%
+  filter(str_detect(GeneName, "tumor")      |
+         str_detect(GO,       "tumor")      |
+         str_detect(GeneName, "carcinogen") |
+         str_detect(GO,       "carcinogen")) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_tumor.tsv")

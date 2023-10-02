@@ -1,11 +1,13 @@
 require 'erb'
+require 'optparse'
 
 class CalculateDeg
 
-  def initialize(disp)
+  def initialize(argv)
     @sample_list = IO.readlines("./sample_list.txt").map(&:chomp)
     @sample_ids  = get_sample_ids(@sample_list)
-    @dispersion  = disp.nil? ? 0.01 : disp
+    @params = argv.getopts("i:d:", "ident:GeneSymbol", "dispersion:0.01")
+    @dispersion  = @params["d"] || @params["dispersion"]
   end
 
   def generate_matrix
@@ -51,6 +53,7 @@ class CalculateDeg
 
     def results_format_script
       date_string = get_date_string
+      uniq_id = @params["i"] || @params["ident"]
       erb = ERB.new(IO.read("#{x_seq_dir}/results_format.r.erb"))
       erb.result(binding)
     end
@@ -78,7 +81,7 @@ class CalculateDeg
 end
 
 if __FILE__ == $0
-  calculate_deg = CalculateDeg.new(ARGV[0])
+  calculate_deg = CalculateDeg.new(ARGV)
   calculate_deg.generate_matrix
   calculate_deg.write_edgeR_script
   calculate_deg.write_results_format_script

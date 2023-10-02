@@ -1,0 +1,25 @@
+library(tidyverse)
+source("~/src/x-seq/generate_heatmaps.r")
+
+dir.create("heatmap")
+
+sample_list <- read_tsv("sample_list.txt", col_names = c("sampleId", "groupId"))
+
+interesting <- tibble("GeneSet" = c("CD_antigen", "MMP", "PCR_control", "TGF_beta", "Wnt",
+                                     "aging", "angiogenesis", "apoptosis", "calcium", "cell_adhesion",
+                                     "cell_cycle", "cytokine_chemokine", "differentiation",
+                                     "extracellular_matrix", "glucose_metabolic_process", "immune",
+                                     "inflammatory", "lipid_metabolic_process", "mitochondrion",
+                                     "ossification", "oxidative_stress", "proliferation", "reactive_oxygen",
+                                     "regeneration", "stem_cell", "transcription_factor", "tumor"))
+
+for(list_name in interesting$GeneSet){
+  list_file     <- paste("list_", list_name, ".tsv", sep = "")
+  heatmap_name  <- paste(list_name, "_genes", sep = "")
+
+  heatmap_data <- read_tsv(list_file) %>%
+    select(GeneSymbol, sample_list$sampleId)
+
+  generate_heatmaps(heatmap_data, heatmap_name, "small")
+  generate_heatmaps(heatmap_data, heatmap_name, "large")
+}

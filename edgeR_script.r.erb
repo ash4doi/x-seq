@@ -4,9 +4,9 @@ source("<%= x_seq_dir %>/RNAseq_plot_lib.r")
 
 sample_list   <- read_tsv("sample_list.txt", col_names = c("sampleIds", "groupIds"))
 counts_matrix <- read_tsv("./counts.matrix", skip = 1,
-                          col_names = c("GeneSymbol", sample_list$sampleIds))
+                          col_names = c("GeneID", sample_list$sampleIds))
 
-data_df       <- column_to_rownames(counts_matrix, "GeneSymbol")
+data_df       <- column_to_rownames(counts_matrix, "GeneID")
 rnaseqMatrix  <- round(data_df)
 rnaseqMatrix  <- rnaseqMatrix[rowSums(rnaseqMatrix) >= nrow(sample_list),]
 
@@ -17,7 +17,7 @@ exp_study <- calcNormFactors(exp_study)
 
 nc <- cpm(exp_study, normalized.lib.sizes = TRUE)
 
-normalized_counts <- as_tibble(rownames_to_column(as.data.frame(nc), "GeneSymbol"))
+normalized_counts <- as_tibble(rownames_to_column(as.data.frame(nc), "GeneID"))
 write_tsv(normalized_counts, "./results/normalized_counts.txt")
 ncBoxPlot(nc, sample_list$sampleIds)
 
@@ -43,8 +43,8 @@ disp_table <- tibble("comp" = c("comp0"), "dispersion" = c(0))
 
   et <- exactTest(comp_study, pair=c(<%= to_strings(pair) %>))
   tTags <- topTags(et, n = NULL)
-  result_table <- as_tibble(rownames_to_column(as.data.frame(tTags), "GeneSymbol"))
-  colnames(result_table) <- c("GeneSymbol",
+  result_table <- as_tibble(rownames_to_column(as.data.frame(tTags), "GeneID"))
+  colnames(result_table) <- c("GeneID",
                               "comp<%= num %>_logFC",  "comp<%= num %>_logCPM",
                               "comp<%= num %>_PValue", "comp<%= num %>_FDR")
   write_tsv(result_table, "./results/comp<%= num %>.edgeR.DE_results")
