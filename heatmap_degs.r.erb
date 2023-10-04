@@ -1,0 +1,25 @@
+library(tidyverse)
+
+source("<%= x_seq_dir %>/generate_heatmaps.r")
+dir.create("heatmap", showWarnings = FALSE)
+
+sample_list <- read_tsv("sample_list.txt", col_names = c("sample_id", "group_id"))
+
+<% comp_list.each do |num, pair| %>
+  # comp<%= num %>
+  controls    <- sample_list %>% filter(group_id == "<%= pair.first %>")
+  experiments <- sample_list %>% filter(group_id == "<%= pair.last  %>")
+  comp_samples <- bind_rows(controls, experiments)
+
+  comp_result <- read_tsv("results/comp<%= num %>_result_deg_by_PValue<%= date_string%>.tsv",
+                          col_types = cols("EntrezID" = col_character()))
+  
+  heatmap_data <- comp_result %>%
+    mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= uniq_id %>, GeneSymbol)) %>%
+    select(GeneSymbol, all_of(comp_samples$sample_id))
+  
+  if (nrow(comp_result)<=2000) {
+     generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "large")
+  }
+  generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "small")
+<% end %>
