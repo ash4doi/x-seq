@@ -1,0 +1,20 @@
+library(tidyverse)
+source("~/src/x-seq/generate_heatmaps.r")
+
+dir.create("heatmap", showWarnings = FALSE)
+
+sample_list <- read_tsv("sample_list.txt", col_names = c("sampleId", "groupId"))
+pathway_list <- read_tsv("pathway_list.txt")
+
+for(pathway_id in pathway_list$PathwayId){
+  pathway_file <- paste("pathway/pathway_", pathway_id, "_result.tsv", sep = "")
+  heatmap_name  <- paste("pathway_", pathway_id, "_genes", sep = "")
+
+  heatmap_data <- read_tsv(pathway_file) %>%
+    select(GeneSymbol, sample_list$sampleId)
+
+  if (nrow(heatmap_data)<=2000) {
+    generate_heatmaps(heatmap_data, heatmap_name, "small")
+  }
+  generate_heatmaps(heatmap_data, heatmap_name, "large")
+}
