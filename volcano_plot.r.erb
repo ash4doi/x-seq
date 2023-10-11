@@ -1,0 +1,22 @@
+library(tidyverse)
+
+source("<%= x_seq_dir %>/generate_volcano.r")
+
+fc_threshold <- 2
+logfc_threshold <- log2(fc_threshold)
+
+annotation <- read_tsv("./annotation.txt") %>% 
+	      mutate("GeneSymbol" = if_else(is.na(GeneSymbol), "<%= uniq_id %>", GeneSymbol))
+
+gene_list <- read_tsv("./gene_list.txt") %>% mutate("marker" = "yes")
+
+<% comp_list.each do |num, pair| %>
+
+  de_results <- read_tsv("results/comp<%= num %>.edgeR.DE_results") %>%
+  		rename("<%= uniq_id %>" = GeneID) %>%
+		inner_join(annotation)
+  
+  plot_data <- create_volcano_data(de_results, gene_list, logfc_threshold)
+  create_volcano_plot(plot_data, "comp<%= num %>", logfc_threshold)
+
+<% end %>
