@@ -29,8 +29,17 @@ class MakeVolcanoPlot
       pair.split(" vs ").map(&:strip)
     end
 
+    def write_dummy_gene_list
+      if(!File.exist?("./gene_list.txt"))
+        File.open("./gene_list.txt", "w") do |f|
+          f.puts("GeneSymbol")
+        end
+      end
+    end
+
     def write_volcano_plot_r
       uniq_id = @params["i"] || @params["ident"]
+      write_dummy_gene_list
       erb = ERB.new(IO.read("#{x_seq_dir}/volcano_plot.r.erb"))
       File.open("./volcano_plot.r", "w") { |f| f.print erb.result(binding) }
     end
