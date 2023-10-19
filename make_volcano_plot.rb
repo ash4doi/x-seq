@@ -1,3 +1,4 @@
+
 #!/usr/bin/env ruby
 
 require 'erb'
@@ -6,7 +7,7 @@ require 'optparse'
 class MakeVolcanoPlot
 
   def initialize(argv)
-    @params = argv.getopts("i:", "ident:GeneSymbol")
+    @params = argv.getopts("i:g:", "ident:GeneSymbol", "gene_list:gene_list.txt")
   end
 
   def create_volcano_plot
@@ -39,7 +40,8 @@ class MakeVolcanoPlot
 
     def write_volcano_plot_r
       uniq_id = @params["i"] || @params["ident"]
-      write_dummy_gene_list
+      gene_list = File.basename(@params["g"] || @params["gene_list"],  ".*")
+      write_dummy_gene_list unless FileTest.exist?(gene_list+".txt")
       erb = ERB.new(IO.read("#{x_seq_dir}/volcano_plot.r.erb"))
       File.open("./volcano_plot.r", "w") { |f| f.print erb.result(binding) }
     end
