@@ -39,9 +39,12 @@ class MakeVolcanoPlot
     end
 
     def write_volcano_plot_r
-      uniq_id = @params["i"] || @params["ident"]
-      gene_list = File.basename(@params["g"] || @params["gene_list"],  ".*")
-      write_dummy_gene_list unless FileTest.exist?(gene_list+".txt")
+      uniq_id   = @params["i"] || @params["ident"]
+      list_file = @params["g"] || @params["gene_list"]
+
+      list_name = File.basename(list_file, ".*")
+      write_dummy_gene_list unless File.exist?(list_file)
+
       erb = ERB.new(IO.read("#{x_seq_dir}/volcano_plot.r.erb"))
       File.open("./volcano_plot.r", "w") { |f| f.print erb.result(binding) }
     end
