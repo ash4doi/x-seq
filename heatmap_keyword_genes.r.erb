@@ -1,0 +1,15 @@
+library(tidyverse)
+source("~/src/x-seq/generate_heatmaps.r")
+
+dir.create("heatmap")
+
+sample_list <- read_tsv("sample_list.txt", col_names = c("sampleId", "groupId"))
+
+list_file     <- "list_<%= clean_name(keyword) %>.tsv"
+heatmap_name  <- paste("<%= clean_name(keyword) %>", "_genes", sep = "")
+
+heatmap_data <- read_tsv(list_file) %>%
+  select(GeneSymbol, sample_list$sampleId)
+
+generate_heatmaps(heatmap_data, heatmap_name, "small")
+generate_heatmaps(heatmap_data, heatmap_name, "large")
