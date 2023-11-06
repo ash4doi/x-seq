@@ -1,11 +1,17 @@
 library("gplots")
 
+remove_all_zero_gene <- function(x) {
+  row_sum <- rowSums(x[, -1])
+  return(x[row_sum > 0, ])
+}
+
 remove_Inf <- function(x) {
   ifelse(is.infinite(x), 0, x)
 }
 
 generate_heatmaps <- function(counts, title, size="small") {
   # size = "large" or "small"
+  counts <- remove_all_zero_gene(counts)
   safe_data <- apply(log2(counts[,-1]), 2, remove_Inf)
   distance_from_median <- sweep(safe_data, 1, apply(safe_data, 1, median))
   data <- data.frame(GeneSymbol = counts[,1], distance_from_median)
