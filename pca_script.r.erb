@@ -1,0 +1,50 @@
+library(tidyverse)
+library(scales)
+
+# all
+normalized_data <- read_tsv("./results/normalized_counts.txt")
+
+x <- normalized_data %>% select(-GeneID)
+
+sample_list <- read_tsv("sample_list.txt", col_names = c("sampleIds", "groupIds"))
+group_list <- sample_list %>% select(groupIds) %>% distinct()
+
+color_list <- group_list %>% mutate("color" = hue_pal()(nrow(group_list)))
+sample_with_color <- sample_list %>% inner_join(color_list)
+
+colors <- sample_with_color$color
+
+pca_result <- prcomp(na.omit(log2(x+1)), scale.=TRUE)
+pca_data <- pca_result$rotation[,1:3]
+result_data <- rownames_to_column(as.data.frame(pca_data), "sample_id")
+write_tsv(result_data, "pca_data_<%= date_string %>.tsv")
+
+importance   <- summary(pca_result)$importance
+summary_data <- rownames_to_column(as.data.frame(importance), "PC")
+write_tsv(summary_data, "pca_summary_<%= date_string %>.tsv")
+
+
+library(rgl)
+
+label <- rownames(pca_data)
+
+## pdf
+par3d(cex = 1.0)
+plot3d(x=pca_data[,1], y=pca_data[,2], z=pca_data[,3],
+       xlab="PC1", ylab="PC2", zlab="PC3",
+       col=colors, size=10, type="p", cex = 2.0)
+text3d(x=pca_data[,1], y=pca_data[,2], z=pca_data[,3],
+       label, adj=-0.2, col=colors, cex = 1.0)
+
+rgl.postscript("pca_image_<%= date_string %>.pdf","pdf")
+
+
+## for html
+par3d(cex = 1.0)
+plot3d(x=pca_data[,1], y=pca_data[,2], z=pca_data[,3],
+       xlab="PC1", ylab="PC2", zlab="PC3",
+       col=colors, size=10, type="p", cex = 1.0)
+text3d(x=pca_data[,1], y=pca_data[,2], z=pca_data[,3],
+       label, adj=-0.2, col=colors, cex = 1.0)
+htmlwidgets::saveWidget(rglwidget(), "./pca_<%= date_string %>.html")
+
