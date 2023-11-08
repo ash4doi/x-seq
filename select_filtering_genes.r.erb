@@ -1,0 +1,14 @@
+library(tidyverse)
+
+all_results <- read_tsv("./results/<%= result_file %>")
+
+concat_go_results <- all_results %>%
+  mutate(GO_BP = if_else(is.na(GO_BiologicalProcess), "", GO_BiologicalProcess)) %>%
+  mutate(GO_CC = if_else(is.na(GO_CellularComponent), "", GO_CellularComponent)) %>%
+  mutate(GO_MF = if_else(is.na(GO_MolecularFunction), "", GO_MolecularFunction)) %>%
+  mutate("GO" = str_c(GO_BP, GO_CC, GO_MF, sep = ",")) %>%
+  select(-GO_BP, -GO_CC, -GO_MF)
+
+interesting_genes_result <- concat_go_results %>%
+  filter(<%= filtering_rule.chomp %>) %>% select(-GO)
+write_tsv(interesting_genes_result, "list_<%= clean_name(filtering_name) %>.tsv")
