@@ -1,6 +1,6 @@
 library(tidyverse)
 
-all_results <- read_tsv("./results/<%= result_file %>")
+all_results <- read_tsv("<%= result_file %>")
 gene_list <- read_tsv("<%= list_file %>")
 
 list_genes_result <- all_results %>% inner_join(gene_list)

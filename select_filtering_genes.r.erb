@@ -1,6 +1,6 @@
 library(tidyverse)
 
-all_results <- read_tsv("./results/<%= result_file %>")
+all_results <- read_tsv("<%= result_file %>")
 
 concat_go_results <- all_results %>%
   mutate(GO_BP = if_else(is.na(GO_BiologicalProcess), "", GO_BiologicalProcess)) %>%
@@ -10,5 +10,5 @@ concat_go_results <- all_results %>%
   select(-GO_BP, -GO_CC, -GO_MF)
 
 interesting_genes_result <- concat_go_results %>%
-  filter(<%= filtering_rule.chomp %>) %>% select(-GO)
+  	filter(<%= filtering_rule %>) %>% select(-GO)
 write_tsv(interesting_genes_result, "list_<%= clean_name(filtering_name) %>.tsv")

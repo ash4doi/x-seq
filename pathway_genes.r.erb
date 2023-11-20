@@ -1,6 +1,6 @@
 library(tidyverse)
 
-all_results <- read_tsv("./results/<%= result_file %>",
+all_results <- read_tsv("<%= result_file %>",
                         col_types = cols(EntrezID = col_character()))
 
 #dir.create("pathway")
