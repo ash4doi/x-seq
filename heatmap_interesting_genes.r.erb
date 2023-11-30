@@ -17,9 +17,14 @@ for(list_name in interesting$GeneSet){
   list_file     <- paste("list_", list_name, ".tsv", sep = "")
   heatmap_name  <- paste(list_name, "_genes", sep = "")
 
-  heatmap_data <- read_tsv(list_file) %>%
+  list_data    <- read_tsv(list_file)
+  heatmap_data <- list_data %>%
     select(GeneSymbol, sample_list$sampleId)
 
-  generate_heatmaps(heatmap_data, heatmap_name, "small")
-  generate_heatmaps(heatmap_data, heatmap_name, "large")
+  row_index <- generate_heatmaps(heatmap_data, heatmap_name, "small")
+  row_index <- generate_heatmaps(heatmap_data, heatmap_name, "large")
+
+  ordered_result <- list_data[rev(row_index),]
+  result_file    <- paste0("heatmap/", list_name, "_result_ordered.tsv")
+  write_tsv(ordered_result, result_file)
 }

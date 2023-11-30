@@ -6,10 +6,15 @@ dir.create("heatmap")
 sample_list <- read_tsv("sample_list.txt", col_names = c("sampleId", "groupId"))
 
 list_file     <- "<%= list_name %>_result.tsv"
-heatmap_name  <- paste("<%= list_name %>", "_genes", sep = "")
+heatmap_name  <- "<%= list_name %>_genes"
 
-heatmap_data <- read_tsv(list_file) %>%
+list_data    <- read_tsv(list_file)
+heatmap_data <- list_data %>%
   select(GeneSymbol, sample_list$sampleId)
 
-generate_heatmaps(heatmap_data, heatmap_name, "small")
-generate_heatmaps(heatmap_data, heatmap_name, "large")
+row_index <- generate_heatmaps(heatmap_data, heatmap_name, "small")
+row_index <- generate_heatmaps(heatmap_data, heatmap_name, "large")
+
+ordered_result <- list_data[rev(row_index),]
+result_file    <- "heatmap/<%= list_name %>_result_ordered.tsv"
+write_tsv(ordered_result, result_file)

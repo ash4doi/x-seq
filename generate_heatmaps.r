@@ -42,6 +42,9 @@ generate_heatmaps <- function(counts, title, size="small") {
   ddr  <- as.dendrogram(hr)
   ddr  <- reorder(ddr, Rowv) # ddr was passed to heatmap.2
 
+  # export for ordered GeneSymbol
+  row_index <- order.dendrogram(ddr)
+
   if(size == "small") {
     # small heatmap
     png(paste("./heatmap/", title, "_GS_", size, ".png", sep = ""),
@@ -113,4 +116,5 @@ generate_heatmaps <- function(counts, title, size="small") {
     )
     dev.off();
   }
+  return(row_index)
 }
