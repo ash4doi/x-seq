@@ -19,7 +19,11 @@ sample_list <- read_tsv("sample_list.txt", col_names = c("sample_id", "group_id"
     select(GeneSymbol, all_of(comp_samples$sample_id))
   
   if (nrow(comp_result)<=2000) {
-     generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "large")
+     row_index <- generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "large")
   }
-  generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "small")
+  row_index <- generate_heatmaps(heatmap_data, "comp<%= num %>_deg_by_PValue", "small")
+
+  ordered_result <- comp_result[rev(row_index),]
+  result_file    <- "heatmap/comp<%= num %>_deg_by_PValue_result_ordered.tsv"
+  write_tsv(ordered_result, result_file)
 <% end %>

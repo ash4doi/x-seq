@@ -10,11 +10,16 @@ for(pathway_id in pathway_list$PathwayId){
   pathway_file <- paste("pathway/pathway_", pathway_id, "_result.tsv", sep = "")
   heatmap_name  <- paste("pathway_", pathway_id, "_genes", sep = "")
 
-  heatmap_data <- read_tsv(pathway_file) %>%
+  pathway_data <- read_tsv(pathway_file)
+  heatmap_data <- pathway_data %>%
     select(GeneSymbol, sample_list$sampleId)
 
   if (nrow(heatmap_data)<=2000) {
-    generate_heatmaps(heatmap_data, heatmap_name, "small")
+    row_index <- generate_heatmaps(heatmap_data, heatmap_name, "small")
   }
-  generate_heatmaps(heatmap_data, heatmap_name, "large")
+  row_index <- generate_heatmaps(heatmap_data, heatmap_name, "large")
+
+  ordered_result <- pathway_data[rev(row_index),]
+  result_file    <- paste0("heatmap/pathway_", pathway_id, "_result_ordered.tsv")
+  write_tsv(ordered_result, result_file)
 }
