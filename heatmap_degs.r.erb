@@ -15,7 +15,7 @@ sample_list <- read_tsv("sample_list.txt", col_names = c("sample_id", "group_id"
                           col_types = cols("EntrezID" = col_character()))
   
   heatmap_data <- comp_result %>%
-    mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= uniq_id %>, GeneSymbol)) %>%
+    mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= @uniq_id %>, GeneSymbol)) %>%
     select(GeneSymbol, all_of(comp_samples$sample_id))
   
   if (nrow(comp_result)<=2000) {

@@ -6,7 +6,8 @@ require 'optparse'
 class MakeHeatmapDeg
 
   def initialize(argv)
-    @params = argv.getopts("i:", "ident:GeneSymbol")
+    params = argv.getopts("i:", "ident:GeneSymbol")
+    @uniq_id = params["i"] || params["ident"] 
   end
 
   def create_deg_heatmaps
@@ -35,7 +36,6 @@ class MakeHeatmapDeg
 
     def write_heatmap_degs_r
       date_string = get_date_string
-      uniq_id = @params["i"] || @params["ident"] 
       erb = ERB.new(IO.read("#{x_seq_dir}/heatmap_degs.r.erb"))
       File.open("./heatmap_degs.r", "w") { |f| f.print erb.result(binding) }
     end

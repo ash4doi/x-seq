@@ -6,26 +6,28 @@ require 'optparse'
 class MakeHeatmapFromList
 
   def initialize(argv)
-    @params = argv.getopts("r:g:", "result:all_results.tsv", "gene_list:")
+    params = argv.getopts("r:g:", "result:all_results.tsv", "gene_list:")
+    @result_file = params["r"] || params["result"]
+    @list_file   = params["g"] || params["gene_list"]
   end
 
   def extract_genes_from_list
-    if (@params["g"] || @params["gene_list"])
-      write_select_list_genes_r
-      system("R --no-save < ./select_list_genes.r")
-    else
+    if @list_file.nil?
       write_select_interesting_genes_r
       system("R --no-save < ./select_interesting_genes.r")
+    else
+      write_select_list_genes_r
+      system("R --no-save < ./select_list_genes.r")
     end
   end
 
   def create_heatmaps
-    if (@params["g"] || @params["gene_list"])
-      write_heatmap_list_genes_r
-      system("R --no-save < ./heatmap_list_genes.r")
-    else
+    if @list_file.nil?
       write_heatmap_interesting_genes_r
       system("R --no-save < ./heatmap_interesting_genes.r")
+    else
+      write_heatmap_list_genes_r
+      system("R --no-save < ./heatmap_list_genes.r")
     end
   end
 
@@ -36,16 +38,12 @@ class MakeHeatmapFromList
     end
 
     def write_select_interesting_genes_r
-      result_file = (@params["r"] || @params["result"])
       erb = ERB.new(IO.read("#{x_seq_dir}/select_interesting_genes.r.erb"))
       File.open("./select_interesting_genes.r", "w") { |f| f.print erb.result(binding) }
     end
 
     def write_select_list_genes_r
-      result_file = (@params["r"] || @params["result"])
-
-      list_file = @params["g"] || @params["gene_list"]
-      list_name = File.basename(list_file, ".*")
+      list_name = File.basename(@list_file, ".*")
 
       erb = ERB.new(IO.read("#{x_seq_dir}/select_list_genes.r.erb"))
       File.open("./select_list_genes.r", "w") { |f| f.print erb.result(binding) }
@@ -57,8 +55,7 @@ class MakeHeatmapFromList
     end
 
     def write_heatmap_list_genes_r
-      list_file = @params["g"] || @params["gene_list"]
-      list_name = File.basename(list_file, ".*")
+      list_name = File.basename(@list_file, ".*")
 
       erb = ERB.new(IO.read("#{x_seq_dir}/heatmap_list_genes.r.erb"))
       File.open("./heatmap_list_genes.r", "w") { |f| f.print erb.result(binding) }
