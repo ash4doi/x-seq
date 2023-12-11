@@ -12,7 +12,7 @@ remove_Inf <- function(x) {
 generate_heatmaps <- function(counts, title, size="small") {
   # size = "large" or "small"
   counts <- remove_all_zero_gene(counts)
-  safe_data <- apply(log2(counts[,-1]), 2, remove_Inf)
+  safe_data <- apply(log2(counts[,-1] + 1), 2, remove_Inf)
   distance_from_median <- sweep(safe_data, 1, apply(safe_data, 1, median))
   data <- data.frame(GeneSymbol = counts[,1], distance_from_median)
 
