@@ -12,8 +12,8 @@ gene_list <- read_tsv("<%= @list_file %>") %>% mutate("marker" = "yes")
 
 <% comp_list.each do |num, pair| %>
   de_results <- read_tsv("results/comp<%= num %>.edgeR.DE_results") %>%
-   rename("<%= @uniq_id %>" = GeneID) %>%
-   inner_join(annotation)
+    rename("<%= @uniq_id %>" = GeneID) %>%
+    left_join(annotation)
 
   plot_data <- create_volcano_data(de_results, gene_list, logfc_threshold)
   create_volcano_plot(plot_data, "<%=list_name %>_comp<%= num %>", logfc_threshold)
