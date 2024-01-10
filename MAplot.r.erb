@@ -1,0 +1,20 @@
+library(tidyverse)
+
+source("<%= x_seq_dir %>/generate_MAplot.r")
+
+fc_threshold <- 1
+logfc_threshold <- log2(fc_threshold)
+
+annotation <- read_tsv("./annotation.txt") %>%
+  mutate("GeneSymbol" = if_else(is.na(GeneSymbol), "<%= @uniq_id %>", GeneSymbol))
+
+gene_list <- read_tsv("<%= @list_file %>") %>% mutate("marker" = "yes")
+
+<% comp_list.each do |num, pair| %>
+  de_results <- read_tsv("results/comp<%= num %>.edgeR.DE_results") %>%
+    rename("<%= @uniq_id %>" = GeneID) %>%
+    left_join(annotation)
+
+  plot_data <- create_MAplot_data(de_results, gene_list, logfc_threshold)
+  create_MAplot(plot_data, "<%=list_name %>_comp<%= num %>", logfc_threshold)
+<% end %>
