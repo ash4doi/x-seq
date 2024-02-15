@@ -6,10 +6,10 @@
   <h3>KEGG PATHWAY LIST</h3>
 
   <body>
-    <% create_rest_urls(pathway_id).each do |i, url| %>
+    <% create_rest_urls(pathway_id).each do |col_name, url| %>
     <p>
       <a href= <%= url %> target="blank">
-        <%= get_pathway_title(pathway_id) %> => comp<%= i %>
+        <%= get_pathway_title(pathway_id) %> => <%= col_name %>
       </a>
     </p>
     <% end %>

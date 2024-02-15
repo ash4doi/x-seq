@@ -78,11 +78,11 @@ class KeggPathwayAnalysis
       data.map { |x| x.split("\t") }
     end
 
-    def rest_url(logFC_data, comp_num, pathway_id)
+    def rest_url(logFC_data, col_num, pathway_id)
       comp_size = (logFC_data.first.size - 1) / 2
       comp_data  = logFC_data.map { |x| {entrez_id: x[0],
-                                         logFC: x[comp_num].to_f,
-                                         PValue: x[comp_size + comp_num].to_f} }
+                                         logFC: x[col_num].to_f,
+                                         PValue: x[comp_size + col_num].to_f} }
       deg_data   = select_deg(comp_data)
       color_data = deg_data.map { |x| "#{x[:entrez_id]}+#{kegg_color_code(x[:logFC])}" }
       rest_data  = color_data.join("%0A").gsub("#", "%23").gsub(",", "%2C")
@@ -115,9 +115,12 @@ class KeggPathwayAnalysis
     end
 
     def create_rest_urls(pathway_id)
-      logFC_data = read_logFC_data(pathway_id).drop(1)
-      comp_size = (logFC_data.first.size - 1) / 2
-      rest_urls = (1..comp_size).map { |i| [i, rest_url(logFC_data, i, pathway_id)] }
+      logFC_data = read_logFC_data(pathway_id)
+      header = logFC_data.first
+      comp_size = (header.size - 1) / 2
+      col_names = header.take(comp_size + 1).map { |x| x.gsub("_logFC", "") }
+      rest_urls = (1..comp_size).map { |i| [col_names[i],
+                                            rest_url(logFC_data.drop(1), i, pathway_id)] }
     end
 
     def generate_pathway_list_html(pathway_id)
