@@ -1,7 +1,7 @@
 library(tidyverse)
 
 data <- read_tsv("./results/normalized_counts.txt")
-all_data <- data
+all_data <- data %>% rename("<%= uniq_id %>" = TranscriptID)
 
 sample_list <- read_tsv("./sample_list.txt", col_names = FALSE)
 colnames(sample_list) <- c("sample_id", "group_id")
@@ -11,7 +11,7 @@ annotation <- read_tsv("./transcript_annotation.txt")
 <% comp_list.each do |num, pair| %>
   # comp<%= num %>
   result <- read_tsv("./results/comp<%= num %>.edgeR.DE_results")
-  sorted_result <- arrange(result, desc(comp<%= num %>_logFC))
+  sorted_result <- arrange(result, desc(comp<%= num %>_logFC)) %>% rename("<%= uniq_id %>" = TranscriptID)
   all_data      <- inner_join(all_data, sorted_result)
   deg_by_PValue <- filter(sorted_result, comp<%= num %>_PValue < 0.05)
   deg_by_logFC  <- filter(sorted_result, abs(comp<%= num %>_logFC) > 1)
@@ -19,7 +19,7 @@ annotation <- read_tsv("./transcript_annotation.txt")
   group1_ids <- filter(sample_list, group_id == "<%= pair.first %>")$sample_id
   group2_ids <- filter(sample_list, group_id == "<%= pair.last  %>")$sample_id
   comp_pair  <- c(group1_ids, group2_ids)
-  comp_data  <- select(data, c("TranscriptId", all_of(comp_pair)))
+  comp_data  <- select(all_data, c(<%= uniq_id %>, all_of(comp_pair)))
   comp_data_with_annot <- left_join(comp_data, annotation)
   
   result_deg_by_PValue <- inner_join(deg_by_PValue, comp_data_with_annot)
