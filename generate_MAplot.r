@@ -40,7 +40,7 @@ create_MAplot <- function(plot_data, comp_name, logfc_threshold){
     geom_text_repel(data = plot_data %>% filter(!is.na(marker_symbol)),
                     max.overlaps = Inf, color = mark_col)
 
-  ee <- e + theme_light(base_size = 16) +
+  e + theme_light(base_size = 16) +
     theme(legend.position = "none") +
     scale_color_manual(values = c(down_col, mark_col, markdown_col, markup_col, non_col, up_col)) +
     labs(title = comp_name)
