@@ -6,9 +6,10 @@ require 'optparse'
 class MakeHeatmapFromList
 
   def initialize(argv)
-    params = argv.getopts("r:g:", "result:all_results.tsv", "gene_list:")
+    params = argv.getopts("r:g:i:", "result:all_results.tsv", "gene_list:", "ident:GeneSymbol")
     @result_file = params["r"] || params["result"]
     @list_file   = params["g"] || params["gene_list"]
+    @uniq_id = params["i"] || params["ident"] 
   end
 
   def extract_genes_from_list

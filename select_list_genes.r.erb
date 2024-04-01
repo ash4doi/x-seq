@@ -1,7 +1,7 @@
 library(tidyverse)
 
 all_results <- read_tsv("<%= @result_file %>")
-gene_list <- read_tsv("<%= @list_file %>")
+gene_list <- read_tsv("<%= @list_file %>") |> na.omit()
 
 list_genes_result <- all_results %>% inner_join(gene_list)
 write_tsv(list_genes_result, "<%= list_name %>_result.tsv")
