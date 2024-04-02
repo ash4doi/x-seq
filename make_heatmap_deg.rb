@@ -6,7 +6,8 @@ require 'optparse'
 class MakeHeatmapDeg
 
   def initialize(argv)
-    params = argv.getopts("i:", "ident:GeneSymbol")
+    params = argv.getopts("r:i:", "result:all_results.tsv", "ident:GeneSymbol")
+    @result_file = params["r"] || params["result"]
     @uniq_id = params["i"] || params["ident"] 
   end
 
@@ -31,7 +32,11 @@ class MakeHeatmapDeg
     end
 
     def get_date_string
-      Time.new.strftime("%Y%m%d")
+      if @result_file == "all_results.tsv"
+        date_string = Time.new.strftime("%Y%m%d")
+      else
+        date_string = @result_file.gsub("results/all_results", "").gsub("\.tsv", "")
+      end
     end
 
     def write_heatmap_degs_r
