@@ -35,7 +35,7 @@ class MakeHeatmapDeg
       if @result_file == "all_results.tsv"
         date_string = Time.new.strftime("%Y%m%d")
       else
-        date_string = @result_file.gsub("results/all_results", "").gsub("\.tsv", "")
+        date_string = File.basename(@result_file, ".*").gsub("all_results", "")
       end
     end
 
