@@ -14,10 +14,16 @@ class RunPCA
     end
   end
 
+  def write_pca_2d_script
+    File.open("./pca_script_2d.r", "w") do |f|
+      f.print pca_script_2d
+    end
+  end
 
   def run_scripts
     system("mkdir -p results")
     system("R --no-save < ./pca_script.r")
+    system("R --no-save < ./pca_script_2d.r")
   end
 
   private
@@ -29,6 +35,12 @@ class RunPCA
     def pca_script
       date_string = get_date_string
       erb = ERB.new(IO.read("#{x_seq_dir}/pca_script.r.erb"))
+      erb.result(binding)
+    end
+
+    def pca_script_2d
+      date_string = get_date_string
+      erb = ERB.new(IO.read("#{x_seq_dir}/pca_script_2d.r.erb"))
       erb.result(binding)
     end
 
@@ -44,5 +56,6 @@ end
 if __FILE__ == $0
   run_pca = RunPCA.new()
   run_pca.write_pca_script
+  run_pca.write_pca_2d_script
   run_pca.run_scripts
 end

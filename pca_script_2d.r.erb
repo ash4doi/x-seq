@@ -1,0 +1,38 @@
+library(tidyverse)
+library(ggrepel)
+
+PCA_data <- read_tsv("pca_data_<%= date_string %>.tsv")
+plot_data <- PCA_data
+
+# repel
+g <- ggplot(plot_data, aes(PC1, PC2, color = sample_id, label = sample_id))
+g + geom_point(size = 3) +
+  geom_text_repel(size = 3, max.overlaps = Inf, show.legend = FALSE) +
+  theme_light(base_size = 10)
+ggsave("plot_PC1_PC2_with_label.png", width = 15, height = 12, units = "in")
+
+g <- ggplot(plot_data, aes(PC1, PC3, color = sample_id, label = sample_id))
+g + geom_point(size = 3) +
+  geom_text_repel(size = 3, max.overlaps = Inf, show.legend = FALSE) +
+  theme_light(base_size = 10)
+ggsave("plot_PC1_PC3_with_label.png", width = 15, height = 12, units = "in")
+
+g <- ggplot(plot_data, aes(PC2, PC3, color = sample_id, label = sample_id))
+g + geom_point(size = 3) +
+  geom_text_repel(size = 3, max.overlaps = Inf, show.legend = FALSE) +
+  theme_light(base_size = 10)
+ggsave("plot_PC2_PC3_with_label.png", width = 15, height = 12, units = "in")
+
+
+# no label
+g <- ggplot(plot_data, aes(PC1, PC2, color = sample_id, label = sample_id))
+g + geom_point(size = 3) + theme_light(base_size = 10)
+ggsave("plot_PC1_PC2_no_label.png", width = 15, height = 12, units = "in")
+
+g <- ggplot(plot_data, aes(PC1, PC3, color = sample_id, label = sample_id))
+g + geom_point(size = 3) + theme_light(base_size = 10)
+ggsave("plot_PC1_PC3_no_label.png", width = 15, height = 12, units = "in")
+
+g <- ggplot(plot_data, aes(PC2, PC3, color = sample_id, label = sample_id))
+g + geom_point(size = 3) + theme_light(base_size = 10)
+ggsave("plot_PC2_PC3_no_label.png", width = 15, height = 12, units = "in")
