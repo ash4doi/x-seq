@@ -1,0 +1,45 @@
+<head>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="myDiv" style="width:100%;height:100%"></div>
+<script>
+Plotly.d3.csv('./<%= @pos_file %>', function(err, rows){
+      function unpack(rows, key) {
+          return rows.map(function(row)
+          { return row[key]; });
+      }
+
+<% color_data.each do |c|%>
+var sample<%= c[:index] %> = {
+  x:unpack(rows, 'x<%= c[:index] %>'),
+  y:unpack(rows, 'y<%= c[:index] %>'),
+  z:unpack(rows, 'z<%= c[:index] %>'),
+  mode: 'markers',
+  marker: {
+    color: '<%= c[:color] %>',
+    size: 12,
+    line: {
+      color: '<%= c[:color] %>',
+      width: 0.5
+    },
+    opacity: 0.8
+  },
+  name: '<%= c[:name] %>',
+  type: 'scatter3d'
+};
+<% end %>
+
+var data = [<%= generate_sample_ids %>];
+var layout = {margin: {
+    l: 0,
+    r: 0,
+    b: 0,
+    t: 0
+  }};
+Plotly.newPlot('myDiv', data, layout);
+});
+</script>
+</body>
