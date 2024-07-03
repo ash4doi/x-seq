@@ -108,9 +108,9 @@ class KeggPathwayAnalysis
 
     def kegg_color_code(logFC)
       if logFC > 0
-        [kegg_color[:bg_up],   kegg_color[:fg]].join(",")
+        [kegg_color[:bg_up]].join(",")
       else
-        [kegg_color[:bg_down], kegg_color[:fg]].join(",")
+        [kegg_color[:bg_down]].join(",")
       end
     end
 
