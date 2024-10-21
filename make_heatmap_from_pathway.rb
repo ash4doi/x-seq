@@ -5,6 +5,11 @@ require 'optparse'
 
 class MakeHeatmapFromPathway
 
+  def initialize(argv)
+    params = argv.getopts("i:", "ident:GeneSymbol")
+    @uniq_id = params["i"] || params["ident"] 
+  end
+
   def create_heatmaps
     write_heatmap_interesting_genes_r
     system("R --no-save < ./heatmap_pathway_genes.r")
@@ -23,6 +28,6 @@ class MakeHeatmapFromPathway
 end
 
 if __FILE__ == $0
-  make_heatmap_from_list = MakeHeatmapFromPathway.new()
+  make_heatmap_from_list = MakeHeatmapFromPathway.new(ARGV)
   make_heatmap_from_list.create_heatmaps
 end

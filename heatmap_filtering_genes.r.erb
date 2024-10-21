@@ -9,6 +9,7 @@ list_file     <- "list_<%= clean_name(filtering_name) %>.tsv"
 heatmap_name  <- paste("<%= clean_name(filtering_name) %>", "_genes", sep = "")
 
 heatmap_data <- read_tsv(list_file) %>%
+  mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= @uniq_id %>, GeneSymbol)) %>%
   select(GeneSymbol, sample_list$sampleId)
 
 generate_heatmaps(heatmap_data, heatmap_name, "small")

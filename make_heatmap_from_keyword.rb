@@ -6,10 +6,11 @@ require 'optparse'
 class MakeHeatmapFromKeyword
 
   def initialize(argv)
-    params = argv.getopts("r:k:f:", "result:all_results.tsv", "keyword:", "filtering_rule:")
+    params = argv.getopts("r:k:f:i:", "result:all_results.tsv", "keyword:", "filtering_rule:", "ident:GeneSymbol")
     @result_file    = params["r"] || params["result"]
     @keyword        = params["k"] || params["keyword"]
     @filtering_file = params["f"] || params["filtering_rule"]
+    @uniq_id = params["i"] || params["ident"] 
   end
 
   def extract_genes_from_keyword

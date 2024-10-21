@@ -12,6 +12,7 @@ for(pathway_id in pathway_list$PathwayId){
 
   pathway_data <- read_tsv(pathway_file)
   heatmap_data <- pathway_data %>%
+    mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= @uniq_id %>, GeneSymbol)) %>%
     select(GeneSymbol, sample_list$sampleId)
 
   if (nrow(heatmap_data)<=2000) {

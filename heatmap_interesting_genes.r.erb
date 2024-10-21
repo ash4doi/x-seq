@@ -19,6 +19,7 @@ for(list_name in interesting$GeneSet){
 
   list_data    <- read_tsv(list_file)
   heatmap_data <- list_data %>%
+    mutate("GeneSymbol" = if_else(is.na(GeneSymbol), <%= @uniq_id %>, GeneSymbol)) %>%
     select(GeneSymbol, sample_list$sampleId)
 
   row_index <- generate_heatmaps(heatmap_data, heatmap_name, "small")
